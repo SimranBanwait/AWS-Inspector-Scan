@@ -9,6 +9,10 @@
 ## To run this scrip firstly we will need to set upt the postfix and configure it accordingly.
 ## We will need to install the [mutt] package to send the email.
 
+
+
+
+
 #PART 1 --------------------------------------------------
 # Set the variables
 AWS_REGION="us-east-1"
