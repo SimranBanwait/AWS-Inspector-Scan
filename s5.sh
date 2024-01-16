@@ -51,7 +51,7 @@ sleep 5
 #Donloading the latest scan run's report to the server
 latest_run_arn=$(aws inspector list-assessment-runs --assessment-template-arn arn:aws:inspector:us-east-1:161786843916:target/0-ptyjBgbD/template/0-DXuMsqUo --filter states=COMPLETED --max-results 1 | jq -r '.assessmentRunArns[0]')
 report=$(aws inspector get-assessment-report --assessment-run-arn $latest_run_arn --report-file-format "PDF" --report-type "FULL" | jq -r '.url')
-curl -s -o report.pdf $report
+curl -s -o /home/ubuntu/report.pdf $report
 echo " "
 echo "Report has been downloaded locally in this serever"
 sleep 5
