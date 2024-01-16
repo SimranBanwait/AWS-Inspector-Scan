@@ -6,6 +6,7 @@
 #Part 3 :: Then we are sending this Report to an email address. 
 
 #PRERQUISITES :: 
+## Curl and JQ Command Packages are need to be installed.
 ## To run this scrip firstly we will need to set upt the postfix and configure it accordingly.
 ## We will need to install the [mutt] package to send the email.
 
