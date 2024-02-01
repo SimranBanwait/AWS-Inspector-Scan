@@ -8,7 +8,6 @@
 #PRERQUISITES :: 
 ## Curl and JQ Command Packages are need to be installed.
 ## To run this scrip firstly we will need to set upt the postfix and configure it accordingly.
-## We will need to install the [mutt] package to send the email.
 
 
 
@@ -62,8 +61,40 @@ sleep 5
 
 #PART 3 -------------------------------------------------
 #Install Postfix, do the configuration
-#Then install mutt :: sudo apt-get install mutt
-echo -e "Hi,\n\nPlease find attached report of the AWS Inspector scan.\nYou can also check the findings here : https://us-east-1.console.aws.amazon.com/inspector/home?region=us-east-1#/run\n\nThanks,\nKandyman" | mutt -a /home/ubuntu/report.pdf -s "Inspector Scan Findings/Report" -- simranbanwait02@gmail.com
-echo " "
-echo "Report has been sent via email SUCCESSFULLY..." 
-sleep 5
+
+TO="simranbanwait02@gmail.com"
+SUBJECT="AWS Inspector Scan Report"
+BODY="Hi, AWS Inspector Scan has been completed, "
+FILE="/home/ubuntu/report.pdf"
+# Create a boundary string
+BOUNDARY="===== $(date +%Y%m%d%H%M%S) ====="
+# Send email using sendmail
+{
+    # Email headers
+    echo "To: $TO"
+    echo "Subject: $SUBJECT"
+    echo "Mime-Version: 1.0"
+    echo "Content-Type: multipart/mixed; boundary=\"$BOUNDARY\""
+    echo
+    # Email body
+    echo "--$BOUNDARY"
+    echo "Content-Type: text/plain; charset=\"US-ASCII\""
+    echo "Content-Transfer-Encoding: 7bit"
+    echo "Content-Disposition: inline"
+    echo
+    echo "$BODY"
+    echo
+    # Email attachment
+    echo "--$BOUNDARY"
+    echo "Content-Type: $(file -b --mime-type $FILE); name=\"$(basename $FILE)\""
+    echo "Content-Transfer-Encoding: base64"
+    echo "Content-Disposition: attachment; filename=\"$(basename $FILE)\""
+    echo
+    base64 "$FILE"
+    echo
+    # End of boundary
+    echo "--$BOUNDARY--"
+} | /usr/sbin/sendmail -t
+
+
+rm report.pdf
