@@ -39,9 +39,6 @@ sleep 2
 
 
 
-
-
-
 #PART2======================================================================================
 
 # Get the latest assessment run ARN
@@ -56,4 +53,31 @@ echo $REPORT_URL
 # Download the report
 wget -O /home/ubuntu/report.pdf "$REPORT_URL"
 echo "Latest Inspector report downloaded to ./latest_inspector_report.pdf"
+
+
+
+
+
+#PART3======================================================================================
+
+# Variables
+from="sanandrosingh@gmail.com"
+to="simranbanwait02@gmail.com"
+subject="Testing........"
+ 
+# Email body with hostname and IP
+body="Hi, Scan has been completed successfully, \n "
+ 
+# Send Email
+sendmail -v -f "$from" "$to" <<EOF
+Subject: $subject
+From: $from
+To: $to
+ 
+$body
+$REPORT_URL
+
+Best regards,
+The DevOps Team
+EOF
 
