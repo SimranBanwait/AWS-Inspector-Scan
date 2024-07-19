@@ -1,0 +1,66 @@
+For EC2 role
+
+inspector:StartAssessmentRun
+inspector:DescribeAssessmentRuns
+inspector:ListAssessmentRuns
+inspector:GetAssessmentReport
+
+EC2 Role Policy
+
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "VisualEditor0",
+			"Effect": "Allow",
+			"Action": [
+				"inspector:GetAssessmentReport",
+				"inspector:DescribeAssessmentRuns",
+				"inspector:ListAssessmentRuns",
+				"inspector:StartAssessmentRun"
+			],
+			"Resource": "*"
+		}
+	]
+}
+
+
+S3 access
+
+s3:PutObject"
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject"
+            ],
+            "Resource": "arn:aws:s3:::billbucketforpoc/Inspector Scans/*"
+        }
+    ]
+}
+
+
+User access
+
+inspector:ListAssessmentTargets
+inspector:ListRulesPackages
+inspector:ListAssessmentTemplates
+
+AmazonInspectorReadOnlyAccess
+
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": [
+				"inspector:CreateResourceGroup",
+				"inspector:CreateAssessmentTarget"
+			],
+			"Resource": "*"
+		}
+	]
+}
