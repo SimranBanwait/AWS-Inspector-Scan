@@ -9,9 +9,9 @@
 
 # Part 1: Start Inspector Scan ===========================================================================
 
-AWS_REGION="us-east-1"
-ASSESSMENT_TEMPLATE_ARN="arn:aws:inspector:us-east-1:161786843916:target/0-ptyjBgbD/template/0-DXuMsqUo"
-REGION="us-east-1"
+AWS_REGION="us-west-2"
+ASSESSMENT_TEMPLATE_ARN="arn:aws:inspector:us-west-2:689344065739:target/0-ROoFx71z/template/0-gTfkmulG"
+REGION="us-west-2"
 
 SCAN_ARN=$(aws inspector start-assessment-run --assessment-template-arn $ASSESSMENT_TEMPLATE_ARN --output text)
 echo " "
@@ -22,7 +22,7 @@ while true; do
   SCAN_STATUS=$(aws inspector describe-assessment-runs --assessment-run-arns $SCAN_ARN --query 'assessmentRuns[0].state' --output text)
   echo " "
   echo "Scan status: $SCAN_STATUS"
-  sleep 2
+  sleep 10
   if [ "$SCAN_STATUS" == "COMPLETED" ]; then
     break
   fi
@@ -33,7 +33,6 @@ echo " "
 echo "Scan is Completed successfully"
 echo " "
 echo "Prepairing Scan report, this will only take few seconds"
-sleep 2
 
 # =========================================================================================================
 
@@ -46,17 +45,15 @@ sleep 2
 
 LATEST_RUN_ARN=$(aws inspector list-assessment-runs --region $REGION --query "assessmentRunArns[0]" --output json | tr -d '"')
 
-sleep 2
 
 REPORT_URL=$(aws inspector get-assessment-report --assessment-run-arn $LATEST_RUN_ARN --report-file-format "PDF" --report-type "FULL" --query "url" --output text)
 
 wget -O /home/ubuntu/report.pdf "$REPORT_URL" >/dev/null 2>&1
-
+sleep 2
 # Check if download was successful (exit code 0)
 if [ $? -eq 0 ]; then
   echo " "
   echo "Latest Inspector report downloaded to /home/ubuntu/report.pdf"
-  sleep 2
 fi
 
 # =========================================================================================================
@@ -68,19 +65,20 @@ fi
 
 # Part 3: Upload Report to S3 Bucket =========================================================================
 
-S3_BUCKET="billbucketforpoc"
-S3_FOLDER="Inspector Scans"
+S3_BUCKET="deepa-poc"
+S3_FOLDER="Inspector-scans"
 LOCAL_REPORT_FILE="/home/ubuntu/report.pdf"
 S3_REPORT_FILENAME="inspector-report-$(date +%Y-%m-%d-%H-%M-%S).pdf"
 
 aws s3 cp $LOCAL_REPORT_FILE "s3://${S3_BUCKET}/${S3_FOLDER}/${S3_REPORT_FILENAME}" >/dev/null 2>&1
+sleep 5
+S3_REPORT_URL="https://${REGION}.console.aws.amazon.com/s3/buckets/${S3_BUCKET}/${S3_FOLDER}/${S3_REPORT_FILENAME}"
 
-S3_REPORT_URL="https://${REGION}.console.aws.amazon.com/s3/buckets/${S3_BUCKET}/${S3_FOLDER}/${S3_REPORT_FILENAME}"   
 
 echo " "
 echo "Inspector report uploaded to S3: $S3_REPORT_URL"
 echo " "
-sleep 2
+
 rm /home/ubuntu/report.pdf
 
 # =========================================================================================================
@@ -93,24 +91,24 @@ rm /home/ubuntu/report.pdf
 #Part 4: Send the email alert ==============================================================================
 
 # Variables
-from="sanandrosingh@gmail.com"
-to="simranbanwait02@gmail.com"
-subject="Testing..........."
- 
+from="DevOps@firminiq.com"
+to="awsalert.staging@ohiomron.com"
+subject="US STG - AWS Inspector Scan Report - SJ Test"
+
 # Email body with hostname and IP
 line1="Inspector Scan has been completed successfully."
 line2="Please find report here: "
- 
+
 # Send Email
 sendmail -v -f "$from" "$to" <<EOF
 Subject: $subject
 From: $from
 To: $to
- 
+
 $line1
 $line2
 $S3_REPORT_URL
- 
+
 Best regards,
 The DevOps Team
 EOF
